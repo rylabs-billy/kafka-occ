@@ -20,6 +20,6 @@ jobs:
 
       - name: Run playbooks in check mode
         shell: bash
-        run: sudo ./scripts/kafka-deploy.sh
+        run: sudo -i -u $(whoami) ./scripts/kafka-deploy.sh
         env:
           CHECK_MODE: 1
