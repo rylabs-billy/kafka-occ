@@ -52,6 +52,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
           ls /tmp/linode
+          ls /usr/local/bin/
           run test
         env:
           CHECK_MODE: 1
