@@ -28,8 +28,10 @@ export GIT_REPO="https://github.com/akamai-compute-marketplace/kafka-occ.git"
 export WORK_DIR="/tmp/linode" 
 export UUID=$(uuidgen | awk -F - '{print $1}')
 
-# enable logging
-exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
+# enable logging (when not in check mode)
+if [ -z "${CHECK_MODE}" ]; then
+  exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
+fi
 
 function cleanup {
   if [ "$?" != "0" ] || [ "$SUCCESS" == "true" ]; then
