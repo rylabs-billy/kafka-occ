@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 DEBUG="NO"
 if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
@@ -28,11 +28,7 @@ export GIT_REPO="https://github.com/akamai-compute-marketplace/kafka-occ.git"
 export WORK_DIR="/tmp/linode" 
 export UUID=$(uuidgen | awk -F - '{print $1}')
 
-# enable logging (when not in check mode)
-# if [ -z "${CHECK_MODE}" ]; then
-#   exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
-# fi
-
+# enable logging
 exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
 
 function cleanup {
