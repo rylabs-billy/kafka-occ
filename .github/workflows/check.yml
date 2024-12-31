@@ -59,9 +59,7 @@ jobs:
 
       - name: Copy run script to path
         shell: bash
-        run: |-
-          cp .scripts/run.sh /usr/local/bin/run
-          echo "/usr/local/bin" >> $GITHUB_PATH
+        run: echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Run playbooks in check mode
         shell: bash
