@@ -54,13 +54,19 @@ jobs:
           ls /tmp/linode
           ls -la /usr/local/bin/
           cat /usr/local/bin/run
+          run build
         env:
           CHECK_MODE: 1
 
       - name: Copy run script to path
         shell: bash
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
+        run: |
+          pwd
+          echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Run playbooks in check mode
         shell: bash
-        run: run test
+        run: |
+          pwd
+          run test
+          run build
