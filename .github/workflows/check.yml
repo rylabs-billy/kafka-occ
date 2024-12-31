@@ -21,8 +21,10 @@ jobs:
       - name: Run playbooks in check mode
         shell: bash
         run: |
-          sudo chown -R $(whoami): /var/lib/apt/lists
-          sudo chown -R $(whoami): /var/lib/dpkg
+          chown_list=("/var/lib/apt/lists" "/var/lib/dpkg" "/var/cache/apt")
+          for dir in "${chown_list[@]}"; do
+            sudo chown -R -R $(whoami): $dir
+          done
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
