@@ -22,7 +22,8 @@ jobs:
         shell: bash
         run: |
           sudo apt clean
-          sudo rm -rf /var/lib/apt/lists/lock
+          #sudo rm -rf /var/lib/apt/lists/lock
+          sudo chown -R $(whoami): /var/lib/apt/lists
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
