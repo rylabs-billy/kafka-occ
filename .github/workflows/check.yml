@@ -19,10 +19,10 @@ jobs:
         run: ./scripts/test-vars.sh
 
       - name: Run playbooks in check mode
-        shell: bash
+        shell: 'script -q -e -c "bash {0}"'
         run: |
           PWD=$(pwd)
           echo $PWD
-          sudo -i -u $(whoami) -- echo $PWD; cd $PWD; ./scripts/kafka-deploy.sh
+          sudo -i -u $(whoami) -- cd $PWD; ./scripts/kafka-deploy.sh
         env:
           CHECK_MODE: 1
