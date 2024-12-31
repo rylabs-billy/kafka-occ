@@ -57,6 +57,7 @@ jobs:
           run test
         env:
           CHECK_MODE: 1
+          GIT_REPO: https://github.com/rylabs-billy/kafka-occ.git
 
       - name: Copy run script to path
         shell: bash

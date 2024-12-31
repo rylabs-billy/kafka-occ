@@ -130,6 +130,7 @@ function setup {
   # clone repo and set up ansible environment
   # git clone ${GIT_REPO} ${WORK_DIR}
   # for a single testing branch
+  # git clone -b ${BRANCH} ${GIT_REPO} ${WORK_DIR}
   git clone -b checkmode ${GIT_REPO} ${WORK_DIR}
 
   # venv
