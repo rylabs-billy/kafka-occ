@@ -51,5 +51,6 @@ jobs:
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
+          run test
         env:
           CHECK_MODE: 1
