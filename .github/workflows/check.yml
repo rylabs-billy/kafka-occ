@@ -24,6 +24,7 @@ jobs:
           PWD=$(pwd)
           echo $PWD
           echo $GITHUB_WORKSPACE
+          sudo apt clean
           sudo -i -u $(whoami)
           apt-get update
           cd $GITHUB_WORKSPACE
