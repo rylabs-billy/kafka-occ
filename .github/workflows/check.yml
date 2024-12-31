@@ -22,6 +22,7 @@ jobs:
         shell: bash
         run: |
           PWD=$(pwd)
-          sudo -i -u $(whoami) -- cd $PWD; ./scripts/kafka-deploy.sh
+          echo $PWD
+          sudo -i -u $(whoami) -- echo $PWD; cd $PWD; ./scripts/kafka-deploy.sh
         env:
           CHECK_MODE: 1
