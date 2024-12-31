@@ -25,6 +25,7 @@ jobs:
           echo $PWD
           echo $GITHUB_WORKSPACE
           sudo -i -u $(whoami)
+          apt-get update
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
         env:
