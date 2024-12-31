@@ -31,8 +31,10 @@ jobs:
           )
 
           for dir in "${chown_list[@]}"; do
-            sudo mkdir -p $dir
-            sudo chown -R -R $(whoami): $dir
+            if [ "${dir}" != "/dev/ttyS0" ]; then
+              sudo mkdir -p $dir
+            fi
+            sudo chown -R $(whoami): $dir
           done
 
       - name: Run playbooks in check mode
