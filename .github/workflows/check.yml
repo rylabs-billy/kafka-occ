@@ -53,9 +53,15 @@ jobs:
           ./scripts/kafka-deploy.sh
           ls /tmp/linode
           ls -la /usr/local/bin/
-          run test
+          cat /usr/local/bin/run
         env:
           CHECK_MODE: 1
+
+      - name: Copy run script to path
+        shell: bash
+        run: |-
+          cp .scripts/run.sh /usr/local/bin/run
+          echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Run playbooks in check mode
         shell: bash
