@@ -31,6 +31,7 @@ jobs:
           )
 
           for dir in "${chown_list[@]}"; do
+            echo "$dir is current item"
             if [ "${dir}" != "/dev/ttyS0" ]; then
               sudo mkdir -p $dir
               if [ "${dir}" == "/usr/local/bin" ]; then
