@@ -45,7 +45,7 @@ jobs:
       #   shell: bash
       #   run: echo "/usr/local/bin" >> $GITHUB_PATH
 
-      - name: Run playbooks in check mode
+      - name: Run deploy script in check mode
         shell: bash
         run: |-
           sudo -i -u $(whoami)
@@ -56,3 +56,7 @@ jobs:
           run test
         env:
           CHECK_MODE: 1
+
+      - name: Run playbooks in check mode
+        shell: bash
+        run: run test
