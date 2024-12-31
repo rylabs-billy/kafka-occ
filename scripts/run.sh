@@ -1,12 +1,8 @@
 #!/bin/bash 
-set -ex
+set -e
 DEBUG="NO"
 if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
-fi
-
-if [ -n "${CHECK_MODE}" ]; then
-  exec > >(tee /dev/ttyS0 /var/log/stackscript.log) 2>&1
 fi
 
 # controller temp sshkey

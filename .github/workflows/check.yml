@@ -34,22 +34,20 @@ jobs:
             echo "$dir is current item"
             if [ "${dir}" != "/dev/ttyS0" ]; then
               sudo mkdir -p $dir
-              if [ "${dir}" == "/usr/local/bin" ]; then
-                echo "$dir" >> "$GITHUB_PATH"
-              fi
             fi
             sudo chown -R $(whoami): $dir
           done
     
-      - name: print path
+      - name: Add to path
         shell: bash
-        run: echo $GITHUB_PATH
+        run: echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Run playbooks in check mode
         shell: bash
         run: |-
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
+          ec
           ./scripts/kafka-deploy.sh
         env:
           CHECK_MODE: 1
