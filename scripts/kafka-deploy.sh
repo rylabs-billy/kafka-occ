@@ -147,10 +147,6 @@ function setup {
   chmod +x /usr/local/bin/run
 }
 
-function installation_complete {
-  echo "Installation Complete"
-}
-
 # main
 setup
 
@@ -158,7 +154,7 @@ if [ -n "${CHECK_MODE}" ]; then
   run test
 else
   run build
-  run deploy && installation_complete
+  run deploy && echo "Installation Complete"
 fi
 
 if [ "${DEBUG}" == "NO" ]; then

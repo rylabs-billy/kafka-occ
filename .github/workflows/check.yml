@@ -31,16 +31,19 @@ jobs:
           )
 
           for dir in "${chown_list[@]}"; do
-            echo "$dir is current item"
+            sudo chown -R $(whoami): $dir
             if [ "${dir}" != "/dev/ttyS0" ]; then
               sudo mkdir -p $dir
             fi
-            sudo chown -R $(whoami): $dir
+            
+            if [ "${dir}" == "/usr/local/bin" ]; then
+              echo "$dir" >> $GITHUB_PATH
+            fi
           done
     
-      - name: Add to path
-        shell: bash
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
+      # - name: Add run script direcotry to path
+      #   shell: bash
+      #   run: echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Run playbooks in check mode
         shell: bash
@@ -48,5 +51,6 @@ jobs:
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
+          run test
         env:
           CHECK_MODE: 1
