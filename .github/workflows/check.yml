@@ -41,9 +41,9 @@ jobs:
             fi
           done
     
-      - name: Add run script to path
-        shell: bash
-        run: echo "/usr/local/bin" >> $GITHUB_PATH
+      # - name: Add run script to path
+      #   shell: bash
+      #   run: echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Run playbooks in check mode
         shell: bash
@@ -52,7 +52,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
           ls /tmp/linode
-          ls /usr/local/bin/
+          ls -la /usr/local/bin/
           run test
         env:
           CHECK_MODE: 1
