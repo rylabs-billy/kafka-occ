@@ -150,7 +150,7 @@ function setup {
 # main
 setup
 
-if [ -n "${CHECK_MODE}" ]; then
+if [ "${CHECK_MODE}" == "1" ]; then
   run test
 else
   run build
