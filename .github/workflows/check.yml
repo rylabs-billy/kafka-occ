@@ -25,7 +25,7 @@ jobs:
           echo $PWD
           echo $GITHUB_WORKSPACE
           sudo -i -u $(whoami)
-          echo "PWD is $PWD"
-          echo $GITHUB_WORKSPACE
+          cd $GITHUB_WORKSPACE
+          ./scripts/kafka-deploy.sh
         env:
           CHECK_MODE: 1
