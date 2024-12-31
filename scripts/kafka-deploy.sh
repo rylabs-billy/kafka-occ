@@ -24,7 +24,8 @@ fi
 # <UDF name="ca_common_name" label="CA Common Name" example="Example: Kafka RootCA" />
 
 # git repo
-export GIT_REPO="https://github.com/akamai-compute-marketplace/kafka-occ.git"
+#export GIT_REPO="https://github.com/akamai-compute-marketplace/kafka-occ.git"
+export GIT_REPO="https://github.com/rylabs-billy/kafka-occ.git"
 export WORK_DIR="/tmp/linode" 
 export UUID=$(uuidgen | awk -F - '{print $1}')
 

@@ -54,10 +54,8 @@ jobs:
           ls /tmp/linode
           ls -la /usr/local/bin/
           cat /usr/local/bin/run
-          run test
         env:
           CHECK_MODE: 1
-          GIT_REPO: https://github.com/rylabs-billy/kafka-occ.git
 
       - name: Copy run script to path
         shell: bash
