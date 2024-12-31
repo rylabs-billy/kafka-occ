@@ -75,6 +75,7 @@ function configure_privateip {
     LINODE_IP="192.168.0.2"
   else
     LINODE_IP=$(get_privateip)
+  fi
 
   if [ ! -z "${LINODE_IP}" ]; then
     echo "[info] Linode private IP present"
