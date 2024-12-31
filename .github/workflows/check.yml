@@ -18,13 +18,26 @@ jobs:
         shell: bash
         run: ./scripts/test-vars.sh
 
-      - name: Run playbooks in check mode
+      - name: Hack github actions runner for check mode
         shell: bash
-        run: |
-          chown_list=("/var/lib/apt/lists" "/var/lib/dpkg" "/var/cache/apt" "/dev/ttyS0" "/var/log")
+        run: |-
+          chown_list=(
+          "/var/lib/apt/lists"
+          "/var/lib/dpkg" 
+          "/var/cache/apt"
+          "/dev/ttyS0"
+          "/var/log"
+          "/usr/local/bin"
+          )
+
           for dir in "${chown_list[@]}"; do
+            sudo mkdir -p $dir
             sudo chown -R -R $(whoami): $dir
           done
+
+      - name: Run playbooks in check mode
+        shell: bash
+        run: |-
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
