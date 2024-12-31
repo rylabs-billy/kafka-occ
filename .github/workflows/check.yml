@@ -1,0 +1,25 @@
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set test UDFs
+        shell: bash
+        run: ./scripts/test-vars.sh
+
+      - name: Run playbooks in check mode
+        shell: bash
+        run: ./scripts/kafka-deploy.sh
+        env:
+          CHECK_MODE: 1

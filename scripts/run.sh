@@ -16,14 +16,22 @@ function controller_sshkey {
     eval $(ssh-agent)
     ssh-add ${SSH_KEY_PATH}
 }
+
 # build instance vars before cluster deployment
 function build {
+  if [ "${CHECK_MODE}" ]; then
+    local LINODE_PARAMS=("${INSTANCE_PREFIX}" "g6-standard-8" "us-ord" "linode/ubuntu22.04")
+    local LINODE_TAGS="test"
+  else
+    local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label,.type,.region,.image))
+    local LINODE_TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
+  fi
   local KAFKA_VERSION="${KAFKA_VERSION}"
-  local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label,.type,.region,.image))
-  local LINODE_TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
   local group_vars="${WORK_DIR}/group_vars/kafka/vars"
   local TEMP_ROOT_PASS=$(openssl rand -base64 32)
-controller_sshkey
+
+  controller_sshkey
+
   cat << EOF >> ${group_vars}
 # user vars
 sudo_username: ${SUDO_USERNAME}
@@ -58,8 +66,14 @@ function deploy {
     ansible-playbook -v -i hosts provision.yml && ansible-playbook -v -i hosts site.yml
 }
 
-## cleanup ##
+function test {
+  build
+  echo "[info] running ansible playbooks in check mode"
+  ansible-playbook -v -i hosts provision.yml --check
+  ansible-playbook -v -i hosts site.yml --check
+}
 
+## cleanup ##
 function cleanup {
   if [ "$?" != "0" ]; then
     if [ -n "$GITHUB_ENV" ]; then
@@ -81,4 +95,5 @@ function destroy {
 case $1 in
     build) "$@"; exit;;
     deploy) "$@"; exit;;
+    test) "$@"; exit;;
 esac

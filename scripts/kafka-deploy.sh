@@ -52,7 +52,6 @@ else
 fi
 
 # cluster functions
-
 function add_privateip {
   echo "[info] Adding instance private IP"
   curl -H "Content-Type: application/json" \
@@ -70,27 +69,36 @@ function get_privateip {
    https://api.linode.com/v4/linode/instances/${LINODE_ID}/ips | \
    jq -r '.ipv4.private[].address'
 }
+
 function configure_privateip {
-  LINODE_IP=$(get_privateip)
-  if [ ! -z "${LINODE_IP}" ]; then
-          echo "[info] Linode private IP present"
+  if [ -n "${CHECK_MODE}" ]; then
+    LINODE_IP="192.168.0.2"
   else
-          echo "[warn] No private IP found. Adding.."
-          add_privateip
-          LINODE_IP=$(get_privateip)
-          ip addr add ${LINODE_IP}/17 dev eth0 label eth0:1
+    LINODE_IP=$(get_privateip)
+
+  if [ ! -z "${LINODE_IP}" ]; then
+    echo "[info] Linode private IP present"
+  else
+    echo "[warn] No private IP found. Adding.."
+    add_privateip
+    LINODE_IP=$(get_privateip)
+    ip addr add ${LINODE_IP}/17 dev eth0 label eth0:1
   fi
 }
+
 function rename_provisioner {
-  INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
-  export INSTANCE_PREFIX=${INSTANCE_PREFIX}
   echo "[info] renaming the provisioner"
-  curl -s -H "Content-Type: application/json" \
+  if [ -n "${CHECK_MODE}" ]; then
+    export INSTANCE_PREFIX="kafka-occ1-${UUID}"
+  else
+    INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
+    export INSTANCE_PREFIX=${INSTANCE_PREFIX}
+    curl -s -H "Content-Type: application/json" \
       -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
       -X PUT -d "{
         \"label\": \"${INSTANCE_PREFIX}1-${UUID}\"
-      }" \
-      https://api.linode.com/v4/linode/instances/${LINODE_ID}
+      }" https://api.linode.com/v4/linode/instances/${LINODE_ID}
+  fi
 }
 
 function setup {
@@ -102,12 +110,21 @@ function setup {
   # rename provisioner and configure private IP if not present
   rename_provisioner
   configure_privateip 
+
   if [ "${ADD_SSH_KEYS}" == "yes" ]; then
     if [ ! -d ~/.ssh ] ; then
       mkdir ~/.ssh
     fi
-    curl -sH "Content-Type: application/json" -H "Authorization: Bearer ${TOKEN_PASSWORD}" https://api.linode.com/v4/profile/sshkeys | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
-  fi  
+
+    if [ -n "${CHECK_MODE}" ]; then
+      echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com" > ${HOME}/.ssh/authorized_keys
+    else
+      curl -sH "Content-Type: application/json" \
+        -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
+        https://api.linode.com/v4/profile/sshkeys \
+        | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
+    fi
+  fi
 
   # clone repo and set up ansible environment
   git clone ${GIT_REPO} ${WORK_DIR}
@@ -116,23 +133,32 @@ function setup {
 
   # venv
   cd ${WORK_DIR}
+
   #pip3 install virtualenv
   python3 -m venv env
   source env/bin/activate
   pip install pip --upgrade
   pip install -r requirements.txt
   ansible-galaxy install -r collections.yml
+
   # copy run script
   cp scripts/run.sh /usr/local/bin/run
   chmod +x /usr/local/bin/run
 }
+
 function installation_complete {
   echo "Installation Complete"
 }
+
 # main
 setup
-run build
-run deploy && installation_complete
+
+if [ -n "${CHECK_MODE}" ]; then
+  run test
+else
+  run build
+  run deploy && installation_complete
+
 if [ "${DEBUG}" == "NO" ]; then
   cleanup
 fi
