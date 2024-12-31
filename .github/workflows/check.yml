@@ -21,7 +21,7 @@ jobs:
       - name: Run playbooks in check mode
         shell: bash
         run: |
-          chown_list=("/var/lib/apt/lists" "/var/lib/dpkg" "/var/cache/apt")
+          chown_list=("/var/lib/apt/lists" "/var/lib/dpkg" "/var/cache/apt" "/dev/ttyS0" "/var/log")
           for dir in "${chown_list[@]}"; do
             sudo chown -R -R $(whoami): $dir
           done
