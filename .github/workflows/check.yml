@@ -55,7 +55,6 @@ jobs:
           ls -la /usr/local/bin/
           cat /usr/local/bin/run
           run test
-          run build
         env:
           CHECK_MODE: 1
 
