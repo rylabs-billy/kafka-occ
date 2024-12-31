@@ -21,9 +21,8 @@ jobs:
       - name: Run playbooks in check mode
         shell: bash
         run: |
-          sudo apt clean
-          #sudo rm -rf /var/lib/apt/lists/lock
           sudo chown -R $(whoami): /var/lib/apt/lists
+          sudo chown -R $(whoami): /var/lib/dpkg
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
