@@ -161,6 +161,7 @@ if [ -n "${CHECK_MODE}" ]; then
 else
   run build
   run deploy && installation_complete
+fi
 
 if [ "${DEBUG}" == "NO" ]; then
   cleanup
