@@ -69,7 +69,7 @@ function deploy {
 function test {
   build
   echo "[info] running ansible playbooks in check mode"
-  ansible-playbook -v provision.yml --check --extra-vars "info=$INFO"
+  ansible-playbook -v provision.yml --check --extra-vars "@info.yml"
   ansible-playbook -v -i hosts site.yml --check
 }
 
