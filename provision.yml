@@ -79,6 +79,7 @@
                 ip_pub1: {{ info.results[count].instance.ipv4[0] }}
                 ip_priv1: {{ info.results[count].instance.ipv4[1] }}
             {%- endfor %}
+    tags: test_vars
 
   - name: add kafka nodes to inventory
     blockinfile:
@@ -91,6 +92,7 @@
         {%- for count in range(cluster_size - 1) %}
         {{ info.results[count + 1].instance.ipv4[0] }} {% if count < controller_count - 1 %}role='controller and broker'{%else%}role='broker only'{%endif%}
         {%- endfor %}
+    tags: test_vars
 
   - name: wait for port 22 to become open
     wait_for:

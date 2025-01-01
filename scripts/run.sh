@@ -61,17 +61,33 @@ ca_common_name: ${CA_COMMON_NAME}
 EOF
 }
 
+function test_instance_info {
+  # for provision.yml in check mode
+  cat <<EOF > info.yml
+info:
+  results:
+    - {"instance": {"ipv4": ["10.0.0.1", "192.168.0.1"]}}
+    - {"instance": {"ipv4": ["10.0.0.2", "192.168.0.2"]}}
+    - {"instance": {"ipv4": ["10.0.0.3", "192.168.0.3"]}}
+EOF
+}
+
 function deploy { 
     echo "[info] running ansible playbooks"
     ansible-playbook -v -i hosts provision.yml && ansible-playbook -v -i hosts site.yml
 }
 
 function test {
-  build
   echo "[info] running ansible playbooks in check mode"
+  build
+
+  # dry run provision.yml
+  test_instance_info
   ansible-playbook -v -i hosts provision.yml --check --extra-vars "@info.yml"
-  cat ./hosts
-  cat ./group_vars/kafka/vars
+
+  # let provision playbook write to vars and hosts files as it does...
+  ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
+  # then dry run site.yml
   ansible-playbook -v -i hosts site.yml --check
 }
 

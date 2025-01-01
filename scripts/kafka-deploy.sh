@@ -149,17 +149,6 @@ function setup {
   chmod +x /usr/local/bin/run
 }
 
-instance_info() {
-  # for provision.yml to write vars file in check mode
-  cat <<EOF > info.yml
-info:
-  results:
-    - {"instance": {"ipv4": ["10.0.0.1", "192.168.0.1"]}}
-    - {"instance": {"ipv4": ["10.0.0.2", "192.168.0.2"]}}
-    - {"instance": {"ipv4": ["10.0.0.3", "192.168.0.3"]}}
-EOF
-}
-
 # main
 setup
 
