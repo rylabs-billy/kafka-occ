@@ -70,7 +70,7 @@ function test {
   build
   echo "[info] running ansible playbooks in check mode"
   ansible-playbook -v -i hosts provision.yml --check --extra-vars "@info.yml"
-  echo hosts
+  cat hosts
   ansible-playbook -v -i hosts site.yml --check
 }
 
