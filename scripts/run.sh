@@ -100,7 +100,7 @@ function test {
   # dry run site.yml
   test:inventory
   ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
-  ansible-playbook -vvv -i hosts site.yml --check --extra-vars "user=$(whoami)"
+  ansible-playbook -vvv -i hosts site.yml --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
 }
 
 ## cleanup ##
