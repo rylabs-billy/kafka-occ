@@ -153,7 +153,6 @@ function setup {
 setup
 
 if [ "${CHECK_MODE}" == "1" ]; then
-  instance_info
   run test
 else
   run build
