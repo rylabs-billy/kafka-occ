@@ -64,6 +64,7 @@ EOF
 function test_instance_info {
   # for provision.yml in check mode
   cat <<EOF > info.yml
+user: $(whoami)
 info:
   results:
     - {"instance": {"ipv4": ["127.1.0.100", "127.2.0.100"]}}
@@ -88,7 +89,7 @@ function test {
   # let provision playbook write to vars and hosts files as it does...
   ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
   # then dry run site.yml
-  ansible-playbook -v -i hosts site.yml --check
+  ansible-playbook -v -i hosts site.yml --check --extra-vars "@info.yml"
 }
 
 ## cleanup ##

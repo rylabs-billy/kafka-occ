@@ -54,9 +54,6 @@ jobs:
             sudo sed -i -e "s/${conf}/${ssh_dict[$conf]}/g" /etc/ssh/sshd_config
           done
           sudo systemctl restart ssh
-          sudo echo $HOME
-          sudo -i
-          echo $HOME
 
       - name: Run deploy script in check mode
         shell: bash
