@@ -41,7 +41,7 @@ jobs:
             fi
           done
 
-          sed -i -e 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config
+          sudo sed -i -e 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config
           sudo systemctl restart ssh
 
       - name: Run deploy script in check mode
