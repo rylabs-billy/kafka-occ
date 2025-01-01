@@ -70,7 +70,8 @@ function test {
   build
   echo "[info] running ansible playbooks in check mode"
   ansible-playbook -v -i hosts provision.yml --check --extra-vars "@info.yml"
-  cat hosts
+  cat ./hosts
+  cat ./group_vars/kafka/vars
   ansible-playbook -v -i hosts site.yml --check
 }
 
