@@ -64,7 +64,12 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        
+
+      - name: Setup tmate session default
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+
       - name: Run deploy script in check mode
         shell: bash
         run: |-
