@@ -61,14 +61,26 @@ ca_common_name: ${CA_COMMON_NAME}
 EOF
 }
 
-function test_instance_info {
+function test:instance_info {
   # for provision.yml in check mode
   cat <<EOF > info.yml
 info:
   results:
     - {"instance": {"ipv4": ["127.1.0.100", "127.2.0.100"]}}
-    - {"instance": {"ipv4": ["127.1.0.101", "127.2.0.102"]}}
-    - {"instance": {"ipv4": ["127.1.0.103", "127.2.0.103"]}}
+    - {"instance": {"ipv4": ["127.1.0.101", "127.2.0.101"]}}
+    - {"instance": {"ipv4": ["127.1.0.102", "127.2.0.102"]}}
+EOF
+}
+
+function test:inventory {
+  cat <<EOF > hosts
+# ansible inventory
+# BEGIN KAFKA INSTANCES
+[kafka]
+localhost ansible_connection=local user=$(whoami) role='controller and broker'
+127.1.0.101 role='controller and broker'
+127.1.0.103 role='controller and broker'
+# END KAFKA INSTANCES
 EOF
 }
 
@@ -82,14 +94,12 @@ function test {
   build
 
   # dry run provision.yml
-  test_instance_info
-  ansible-playbook -vvv -i hosts provision.yml --check --extra-vars "@info.yml"
+  test:instance_info
+  ansible-playbook -v -i hosts provision.yml --check --extra-vars "@info.yml"
 
-  # let provision playbook write to vars and hosts files as it does...
-  ansible-playbook -vvv -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
-  cat hosts
-  # then dry run site.yml
-  ansible-playbook -vvv -i hosts site.yml --user $(whoami) --check --extra-vars "@info.yml"
+  # dry run site.yml
+  test:inventory
+  ansible-playbook -vvv -i hosts site.yml --check --extra-vars "@info.yml"
 }
 
 ## cleanup ##
