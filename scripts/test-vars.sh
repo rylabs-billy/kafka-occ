@@ -38,6 +38,20 @@ set_vars() {
   done
 }
 
+set_info_vars() {
+  # for provision.yml to write vars file in check mode
+  export INFO='{"results": [
+          {"instance": {"ipv4": ["10.0.0.1", "192.168.0.1"]}},
+          {"instance": {"ipv4": ["10.0.0.2", "192.168.0.2"]}},
+          {"instance": {"ipv4": ["10.0.0.3", "192.168.0.3"]}},
+          {"instance": {"ipv4": ["10.0.0.4", "192.168.0.4"]}},
+          {"instance": {"ipv4": ["10.0.0.5", "192.168.0.5"]}},
+          {"instance": {"ipv4": ["10.0.0.6", "192.168.0.6"]}},
+          {"instance": {"ipv4": ["10.0.0.7", "192.168.0.7"]}}
+        ]}'
+  github_env "INFO" "${INFO}"
+}
+
 # main
 build_dict
 set_vars

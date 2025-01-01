@@ -40,10 +40,6 @@ jobs:
               echo "$dir" >> $GITHUB_PATH
             fi
           done
-    
-      # - name: Add run script to path
-      #   shell: bash
-      #   run: echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Run deploy script in check mode
         shell: bash
@@ -54,16 +50,3 @@ jobs:
         env:
           TOKEN_PASSWORD: r3@llystr0ngp455w0rd
           CHECK_MODE: 1
-
-      # - name: Copy run script to path
-      #   shell: bash
-      #   run: |
-      #     pwd
-      #     echo "/usr/local/bin" >> $GITHUB_PATH
-
-      # - name: Run playbooks in check mode
-      #   shell: bash
-      #   run: |
-      #     pwd
-      #     run test
-      #     run build
