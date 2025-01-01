@@ -66,9 +66,9 @@ function test_instance_info {
   cat <<EOF > info.yml
 info:
   results:
-    - {"instance": {"ipv4": ["10.0.0.1", "192.168.0.1"]}}
-    - {"instance": {"ipv4": ["10.0.0.2", "192.168.0.2"]}}
-    - {"instance": {"ipv4": ["10.0.0.3", "192.168.0.3"]}}
+    - {"instance": {"ipv4": ["127.1.0.100", "127.2.0.100"]}}
+    - {"instance": {"ipv4": ["127.1.0.101", "127.2.0.102"]}}
+    - {"instance": {"ipv4": ["127.1.0.103", "127.2.0.103"]}}
 EOF
 }
 
