@@ -87,6 +87,7 @@ function test {
 
   # let provision playbook write to vars and hosts files as it does...
   ansible-playbook -vvv -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
+  cat hosts
   # then dry run site.yml
   ansible-playbook -vvv -i hosts site.yml --user $(whoami) --check --extra-vars "@info.yml"
 }
