@@ -5,18 +5,39 @@ if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
 fi
 
-function check_mode_deps {
+function test:apt_chk {
+  # list of dependent apt packages
+  # using 'list' type with a 'for loop' for future extendibility and reuse
+  deps=("fail2ban")
+  paths=("/etc/" "/usr/lib" "/usr/bin/" "/usr/sbin/" "/var/")
+
+  if [ "${APT_CHK}" != "1" ]; then
+    for package in "${deps[@]}"; do
+      sudo apt install "${file}" -y
+      # list of installed files to chown
+      file_list=()
+      for file in $(dpkg-query -L "${package}"); do
+        for path in "${paths[@]}"; do
+          [[ "${file}" == "${path}"* ]] && file_list+=("$file")
+        done
+      done
+
+      for file in "${file_list[@]}"; do
+        sudo chown -R $(whoami): "$file"
+      done
+    done
+  fi
+  export APT_CHK="1"
+}
+
+function test:check_mode_deps {
   if [ $"${CHECK_MODE}" == "1" ]; then
     # get name of caller (parent) function
     caller="${FUNCNAME[1]}"
 
-    # list of dependent apt packages
-    # using 'list' type with a 'for loop' for future extendibility and reuse
-    deps=("fail2ban")
-    for file in "${deps[@]}"; do
-      sudo apt install $file -y
-    done
-    
+    # done run apt a second time
+    test:apt_chk
+
     if [ "${caller}" == "controller_sshkey" ]; then
       echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
     fi
@@ -38,7 +59,7 @@ function controller_sshkey {
     chmod 600 ${SSH_KEY_PATH}
     eval $(ssh-agent)
     ssh-add ${SSH_KEY_PATH}
-    check_mode_deps
+    test:check_mode_deps
 }
 
 # build instance vars before cluster deployment
@@ -49,7 +70,7 @@ function build {
   local group_vars="${WORK_DIR}/group_vars/kafka/vars"
   local TEMP_ROOT_PASS=$(openssl rand -base64 32)
 
-  check_mode_deps
+  test:check_mode_deps
   controller_sshkey
 
   cat << EOF >> ${group_vars}
