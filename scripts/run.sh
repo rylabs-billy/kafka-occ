@@ -15,6 +15,9 @@ function controller_sshkey {
     chmod 600 ${SSH_KEY_PATH}
     eval $(ssh-agent)
     ssh-add ${SSH_KEY_PATH}
+    if [ "${CHECK_MODE}" == "1" ]; then
+      echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
+    fi
 }
 
 # build instance vars before cluster deployment
