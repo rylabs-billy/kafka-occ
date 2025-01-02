@@ -22,30 +22,31 @@ jobs:
 
       - name: Set test UDFs
         shell: bash
-        run: ./scripts/test-vars.sh
+        run: sudo ./scripts/test-vars.sh
+        # run: ./scripts/test-vars.sh
 
       - name: Hack github actions runner for check mode
         shell: bash
         run: |-
           # modify permissions to emulate the ansible playbook user (root)
-          chown_list=(
-          "/var/lib/apt"
-          "/var/lib/update-notifier"
-          "/var/lib/dpkg"
-          "/var/cache/apt"
-          "/var/cache/debconf"
-          "/usr/bin/dpkg"
-          "/dev/ttyS0"
-          "/var/log"
-          "/usr/local/bin"
-          )
+          # chown_list=(
+          # "/var/lib/apt"
+          # "/var/lib/update-notifier"
+          # "/var/lib/dpkg"
+          # "/var/cache/apt"
+          # "/var/cache/debconf"
+          # "/usr/bin/dpkg"
+          # "/dev/ttyS0"
+          # "/var/log"
+          # "/usr/local/bin"
+          # )
 
-          for item in "${chown_list[@]}"; do
-            sudo chown -R $(whoami): $item
-            _file=$(file "${item}" | awk '{print $2}')
-            [ "${_file}" == 'directory' ] && sudo mkdir -p $item
-            [ "${item}" == "/usr/local/bin" ] && echo "$item" >> $GITHUB_PATH
-          done
+          # for item in "${chown_list[@]}"; do
+          #   sudo chown -R $(whoami): $item
+          #   _file=$(file "${item}" | awk '{print $2}')
+          #   [ "${_file}" == 'directory' ] && sudo mkdir -p $item
+          #   [ "${item}" == "/usr/local/bin" ] && echo "$item" >> $GITHUB_PATH
+          # done
 
           # update ssh configs for localhost connections via ansible 
           declare -A ssh_dict
@@ -73,10 +74,11 @@ jobs:
       - name: Run deploy script in check mode
         id: check-mode
         shell: bash
-        run: |-
-          sudo -i -u $(whoami)
-          cd $GITHUB_WORKSPACE
-          ./scripts/kafka-deploy.sh
+        run: sudo ./scripts/kafka-deploy.sh
+        # run: |-
+        #   sudo -i -u $(whoami)
+        #   cd $GITHUB_WORKSPACE
+        #   ./scripts/kafka-deploy.sh
         env:
           TOKEN_PASSWORD: r3@llystr0ngp455w0rd
           CHECK_MODE: 1

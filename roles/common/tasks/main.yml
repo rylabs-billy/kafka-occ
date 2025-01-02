@@ -30,7 +30,6 @@
     - ufw
     - acl
     state: latest
-  check_mode: false
 
 - name: fail2ban jail.local
   copy:
