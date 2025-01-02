@@ -21,6 +21,7 @@ function kafka_deps {
 
   # add kafka user and group
   useradd --system -s /usr/bin/nologin -m $(cat $defaults | yq .kafka_data_directory)
+  id kafka
 
   # write dirs and vars from roles/kafka/defaults/main.yml
   kafka_file_list=($(
@@ -31,7 +32,12 @@ function kafka_deps {
     ))
 
   for file in "${kafka_file_list[@]}"; do
-    [[ "$file" == *"kafka"* ]] && mkdir -p $file || export kafka_version="$file"
+    if [[ "$file" == *"kafka"* ]]; then
+      mkdir -p $file
+      chown -R kafka: $file
+    else
+      export kafka_version="$file"
+    fi
   done
 
   curl -s -o "/tmp/kafka_2.13-${kafka_version}.tgz" \
