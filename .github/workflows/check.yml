@@ -43,13 +43,8 @@ jobs:
 
           for item in "${chown_list[@]}"; do
             sudo chown -R $(whoami): $item
-            if [ "${item}" != "/dev/ttyS0" ]; then
-              sudo mkdir -p $item
-            fi
-            
-            if [ "${item}" == "/usr/local/bin" ]; then
-              echo "$item" >> $GITHUB_PATH
-            fi
+            [ "${item}" != "/dev/ttyS0" ] || [ "${item}" == "/var/lib/dpkg" ] && sudo mkdir -p $item
+            [ "${item}" == "/usr/local/bin" ] && echo "$item" >> $GITHUB_PATH
           done
 
           # update ssh configs for localhost connections via ansible 
@@ -79,7 +74,8 @@ jobs:
 
       - name: Setup tmate debugging session
         uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        # if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
         with:
           detached: true
         env:
