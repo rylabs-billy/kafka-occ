@@ -14,7 +14,7 @@ function check_mode_deps {
     # using 'list' type with a 'for loop' for future extendibility and reuse
     deps=("fail2ban")
     for file in "${deps[@]}"; do
-      apt install $file -y
+      sudo apt install $file -y
     done
     
     if [ "${caller}" == "controller_sshkey" ]; then
