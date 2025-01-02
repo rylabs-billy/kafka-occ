@@ -38,12 +38,11 @@ jobs:
           "/dev/ttyS0"
           "/var/log"
           "/usr/local/bin"
-          "/var/lib/dpkg"
           )
 
           for item in "${chown_list[@]}"; do
             sudo chown -R $(whoami): $item
-            [ "${item}" != "/dev/ttyS0" ] || [ "${item}" != "/var/lib/dpkg" ] && sudo mkdir -p $item
+            [ "${item}" != "/dev/ttyS0" ] || [ "${item}" != "/usr/bin/dpkg" ] && sudo mkdir -p $item
             [ "${item}" == "/usr/local/bin" ] && echo "$item" >> $GITHUB_PATH
           done
 
