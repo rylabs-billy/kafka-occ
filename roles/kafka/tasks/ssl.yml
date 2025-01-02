@@ -28,7 +28,7 @@
     group: kafka
   no_log: true
   register: ca_key
-  run_once: true
+  # run_once: true
   delegate_to: localhost
 
 - name: generate ca csr
