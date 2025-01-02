@@ -7,8 +7,11 @@ fi
 
 function test:apt_chk {
   if [ "${APT_CHK}" != "1" ]; then
-    sudo apt install fail2ban -y
+    apt install fail2ban -y
+    # sudo apt install fail2ban -y
     # sudo chown -R $(whoami): /etc/fail2ban
+    curl -s -o /tmp/kafka_2.13-${KAFKA_VERSION}.tgz \
+      "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz"
     export APT_CHK="1"
   fi
 }
@@ -127,7 +130,8 @@ function test {
   # run provision.yml without check mode to populate our vars and hosts files...
   ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
   # then check site.yml
-  ansible-playbook -vv -i hosts site.yml --become --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
+  ansible-playbook -vv -i hosts site.yml --become --check
+  # ansible-playbook -vv -i hosts site.yml --become --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
 }
 
 ## cleanup ##
