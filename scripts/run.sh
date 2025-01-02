@@ -19,7 +19,7 @@ function test:check_mode_deps {
     caller="${FUNCNAME[1]}"
 
     # don't run apt a second time
-    test:apt_chk
+    # test:apt_chk
 
     if [ "${caller}" == "controller_sshkey" ]; then
       echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
