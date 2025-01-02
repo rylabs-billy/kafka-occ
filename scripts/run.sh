@@ -1,6 +1,6 @@
 #!/bin/bash 
 set -ex
-source app-deps.sh
+source ./scripts/app-deps.sh
 
 DEBUG="NO"
 if [ "${DEBUG}" == "NO" ]; then
