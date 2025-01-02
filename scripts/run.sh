@@ -17,9 +17,9 @@ function test:check_mode_deps {
   if [ $"${CHECK_MODE}" == "1" ]; then
     # get name of caller (parent) function
     caller="${FUNCNAME[1]}"
-    
+
     # don't run apt a second time
-    test:apt_chk
+    # test:apt_chk
 
     if [ "${caller}" == "controller_sshkey" ]; then
       echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
@@ -119,6 +119,7 @@ function test {
 
   # dry run provision.yml
   test:instance_info
+  # sudo -i -u $(whoami)
   ansible-playbook -v -i hosts provision.yml --check --extra-vars "@info.yml"
 
   # dry run site.yml
@@ -126,7 +127,7 @@ function test {
   # run provision.yml without check mode to populate our vars and hosts files...
   ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
   # then check site.yml
-  ansible-playbook -vvv -i hosts site.yml --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
+  ansible-playbook -vv -i hosts site.yml --become --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
 }
 
 ## cleanup ##
