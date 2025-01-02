@@ -8,7 +8,7 @@ fi
 function test:apt_chk {
   if [ "${APT_CHK}" != "1" ]; then
     sudo apt install fail2ban -y
-    sudo chown -R $(whoami): /etc/fail2ban
+    # sudo chown -R $(whoami): /etc/fail2ban
     export APT_CHK="1"
   fi
 }
@@ -19,7 +19,7 @@ function test:check_mode_deps {
     caller="${FUNCNAME[1]}"
 
     # don't run apt a second time
-    # test:apt_chk
+    test:apt_chk
 
     if [ "${caller}" == "controller_sshkey" ]; then
       echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
