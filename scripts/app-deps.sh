@@ -21,7 +21,7 @@ function kafka_deps {
   home_dir=$(cat $defaults | yq .kafka_data_directory)
 
   # add kafka user and group
-  useradd --system -s /usr/bin/nologin -m $home_dir kafka
+  useradd --system --user-group -s /usr/bin/nologin -m -d $home_dir kafka
   id kafka
 
   # write dirs and vars from roles/kafka/defaults/main.yml
