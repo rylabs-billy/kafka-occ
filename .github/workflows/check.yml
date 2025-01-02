@@ -60,15 +60,6 @@ jobs:
             sudo sed -i -e "s/${conf}/${ssh_dict[$conf]}/g" /etc/ssh/sshd_config
           done
           sudo systemctl restart ssh
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-        with:
-          detached: true
-        env:
-          TOKEN_PASSWORD: r3@llystr0ngp455w0rd
-          CHECK_MODE: 1
           
       - name: Run deploy script in check mode
         shell: bash
@@ -76,6 +67,15 @@ jobs:
           sudo -i -u $(whoami)
           cd $GITHUB_WORKSPACE
           ./scripts/kafka-deploy.sh
+        env:
+          TOKEN_PASSWORD: r3@llystr0ngp455w0rd
+          CHECK_MODE: 1
+
+      - name: Setup tmate debugging session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          detached: true
         env:
           TOKEN_PASSWORD: r3@llystr0ngp455w0rd
           CHECK_MODE: 1
