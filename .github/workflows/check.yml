@@ -63,6 +63,7 @@ jobs:
           sudo systemctl restart ssh
           
       - name: Run deploy script in check mode
+        id: check-mode
         shell: bash
         run: |-
           sudo -i -u $(whoami)
@@ -74,7 +75,7 @@ jobs:
 
       - name: Setup tmate debugging session
         uses: mxschmitt/action-tmate@v3
-        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled && steps.*.outcome == 'failure' }}
         # if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
         with:
           detached: true
