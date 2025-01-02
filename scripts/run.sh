@@ -20,12 +20,18 @@ function test:check_mode_deps {
   if [ $"${CHECK_MODE}" == "1" ]; then
     # get name of caller (parent) function
     caller="${FUNCNAME[1]}"
-
+    user=$(whoami)
+    echo
+    echo
+    echo $user
+    echo
+    echo
     # don't run apt a second time
     # test:apt_chk
 
     if [ "${caller}" == "controller_sshkey" ]; then
-      echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
+      [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
+      echo $ANSIBLE_SSH_PUB_KEY >> ${HOME_DIR}/.ssh/authorized_keys
     fi
 
     if [ "${caller}" == "build" ]; then
