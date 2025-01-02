@@ -27,6 +27,7 @@ jobs:
       - name: Hack github actions runner for check mode
         shell: bash
         run: |-
+          # modify permissions to emulate the ansible playbook user (root)
           chown_list=(
           "/var/lib/apt"
           "/var/lib/update-notifier"
@@ -37,19 +38,21 @@ jobs:
           "/dev/ttyS0"
           "/var/log"
           "/usr/local/bin"
+          "/var/lib/dpkg"
           )
 
-          for dir in "${chown_list[@]}"; do
-            sudo chown -R $(whoami): $dir
-            if [ "${dir}" != "/dev/ttyS0" ]; then
-              sudo mkdir -p $dir
+          for item in "${chown_list[@]}"; do
+            sudo chown -R $(whoami): $item
+            if [ "${item}" != "/dev/ttyS0" ]; then
+              sudo mkdir -p $item
             fi
             
-            if [ "${dir}" == "/usr/local/bin" ]; then
-              echo "$dir" >> $GITHUB_PATH
+            if [ "${item}" == "/usr/local/bin" ]; then
+              echo "$item" >> $GITHUB_PATH
             fi
           done
 
+          # update ssh configs for localhost connections via ansible 
           declare -A ssh_dict
           ssh_dict["#ListenAddress 0.0.0.0"]="ListenAddress 0.0.0.0"
           ssh_dict["PermitRootLogin yes"]="PermitRootLogin no"
