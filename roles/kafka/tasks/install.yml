@@ -17,6 +17,7 @@
     owner: kafka
     group: kafka
     mode: 0644
+  check_mode: false
 
 - name: untar kafka archive
   unarchive:
