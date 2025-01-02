@@ -22,7 +22,10 @@ function test:file_chk {
     for file in "${kafka_file_list[@]}"; do
       [[ "$file" == *"kafka"* ]] && mkdir -p $file || export kafka_version="$file"
     done
-    
+
+    curl -s -o "/tmp/kafka_2.13-{{ kafka_version }}.tgz" \
+      "https://downloads.apache.org/kafka/${kafka_version}/kafka_2.13-${kafka_version}.tgz"
+
     export FILE_CHK="1"
   fi
 }
