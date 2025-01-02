@@ -28,9 +28,12 @@ jobs:
         shell: bash
         run: |-
           chown_list=(
-          "/var/lib/apt/lists"
-          "/var/lib/dpkg" 
+          "/var/lib/apt"
+          "/var/lib/update-notifier"
+          "/var/lib/dpkg"
           "/var/cache/apt"
+          "/var/cache/debconf"
+          "/usr/bin/dpkg"
           "/dev/ttyS0"
           "/var/log"
           "/usr/local/bin"
