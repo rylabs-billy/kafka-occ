@@ -18,9 +18,10 @@ function playbook_deps {
 function kafka_deps {
   echo "[info] configure kafka dependencies"
   defaults="roles/kafka/defaults/main.yml"
+  home_dir=$(cat $defaults | yq .kafka_data_directory)
 
   # add kafka user and group
-  useradd --system -s /usr/bin/nologin -m $(cat $defaults | yq .kafka_data_directory)
+  useradd --system -s /usr/bin/nologin -m $home_dir kafka
   id kafka
 
   # write dirs and vars from roles/kafka/defaults/main.yml
