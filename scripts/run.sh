@@ -115,6 +115,7 @@ truststore_password: 4a3ab688-c959-11ef-b7ef-c3d2d00d00e9
 keystore_password: 4a3ab890-c959-11ef-b7f0-43b5a08a833c
 ca_password: 4a3ab8fe-c959-11ef-b7f1-8b5f5d5abd07
 sudo_password: 4a3ab962-c959-11ef-b7f2-9f75255196f2
+
 info:
   results:
     - {"instance": {"ipv4": ["127.1.0.100", "127.2.0.100"]}}
@@ -156,7 +157,7 @@ function test {
   # run provision.yml without check mode to populate our vars and hosts files...
   ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@vars.yml"
   # then check site.yml
-  ansible-playbook -vv -i hosts site.yml --become --check
+  ansible-playbook -vv -i hosts site.yml --become --check --extra-vars "@vars.yml"
   # ansible-playbook -vv -i hosts site.yml --become --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
 }
 
