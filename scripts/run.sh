@@ -11,8 +11,18 @@ function test:file_chk {
     apt install fail2ban -y
 
     # other required files
-    curl -s -o /tmp/kafka_2.13-${KAFKA_VERSION}.tgz \
-      "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz"
+    # write dirs and vars from roles/kafka/defaults/main.yml
+    kafka_file_list=($(
+      cat ../roles/kafka/defaults/main.yml \
+      | grep -Ev '#|---' \
+      | IFS='\n' awk '{print $2}' \
+      | tr '\n' ' '
+      ))
+
+    for file in "${kafka_file_list[@]}"; do
+      [[ "$file" == *"kafka"* ]] && mkdir -p $file || export kafka_version="$file"
+    done
+    
     export FILE_CHK="1"
   fi
 }
