@@ -5,14 +5,15 @@ if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
 fi
 
-function test:apt_chk {
-  if [ "${APT_CHK}" != "1" ]; then
+function test:file_check {
+  if [ "${FILE_CHK}" != "1" ]; then
+    # required files from apt install
     apt install fail2ban -y
-    # sudo apt install fail2ban -y
-    # sudo chown -R $(whoami): /etc/fail2ban
+    
+    # other required files
     curl -s -o /tmp/kafka_2.13-${KAFKA_VERSION}.tgz \
       "https://downloads.apache.org/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz"
-    export APT_CHK="1"
+    export FILE_CHK="1"
   fi
 }
 
@@ -21,13 +22,9 @@ function test:check_mode_deps {
     # get name of caller (parent) function
     caller="${FUNCNAME[1]}"
     user=$(whoami)
-    echo
-    echo
-    echo $user
-    echo
-    echo
-    # don't run apt a second time
-    # test:apt_chk
+
+    # don't install dependent files a second time
+    test:file_chk
 
     if [ "${caller}" == "controller_sshkey" ]; then
       [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
