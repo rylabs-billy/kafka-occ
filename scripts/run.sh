@@ -6,36 +6,19 @@ if [ "${DEBUG}" == "NO" ]; then
 fi
 
 function test:apt_chk {
-  # list of dependent apt packages
-  # using 'list' type with a 'for loop' for future extendibility and reuse
-  deps=("fail2ban")
-  paths=("/etc/" "/usr/lib" "/usr/bin/" "/usr/sbin/" "/var/")
-
   if [ "${APT_CHK}" != "1" ]; then
-    for package in "${deps[@]}"; do
-      sudo apt install "${file}" -y
-      # list of installed files to chown
-      file_list=()
-      for file in $(dpkg-query -L "${package}"); do
-        for path in "${paths[@]}"; do
-          [[ "${file}" == "${path}"* ]] && file_list+=("$file")
-        done
-      done
-
-      for file in "${file_list[@]}"; do
-        sudo chown -R $(whoami): "$file"
-      done
-    done
+    sudo apt install fail2ban -y
+    sudo chown -R $(whoami): /etc/fail2ban
+    export APT_CHK="1"
   fi
-  export APT_CHK="1"
 }
 
 function test:check_mode_deps {
   if [ $"${CHECK_MODE}" == "1" ]; then
     # get name of caller (parent) function
     caller="${FUNCNAME[1]}"
-
-    # done run apt a second time
+    
+    # don't run apt a second time
     test:apt_chk
 
     if [ "${caller}" == "controller_sshkey" ]; then
