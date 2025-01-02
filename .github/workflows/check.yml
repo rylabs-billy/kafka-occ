@@ -42,7 +42,8 @@ jobs:
 
           for item in "${chown_list[@]}"; do
             sudo chown -R $(whoami): $item
-            [ "${item}" != "/dev/ttyS0" ] || [ "${item}" != "/usr/bin/dpkg" ] && sudo mkdir -p $item
+            _file=$(file "${item}" | awk '{print $2}')
+            [ "${_file}" == 'directory' ] && sudo mkdir -p $item
             [ "${item}" == "/usr/local/bin" ] && echo "$item" >> $GITHUB_PATH
           done
 
@@ -74,7 +75,8 @@ jobs:
 
       - name: Setup tmate debugging session
         uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled && steps.*.outcome == 'failure' }}
+        # if: ${{ success() || steps.test.conclusion == 'failure' }}
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
         # if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
         with:
           detached: true
