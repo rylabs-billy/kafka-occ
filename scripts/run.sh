@@ -12,6 +12,9 @@ function test:file_chk {
 
     # other required files
     # write dirs and vars from roles/kafka/defaults/main.yml
+    echo $(pwd)
+    cat ../roles/kafka/defaults/main.yml
+    
     kafka_file_list=($(
       cat ../roles/kafka/defaults/main.yml \
       | grep -Ev '#|---' \
