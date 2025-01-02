@@ -5,29 +5,6 @@ if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
 fi
 
-function check_mode_deps {
-  if [ $"${CHECK_MODE}" == "1" ]; then
-    # get name of caller (parent) function
-    caller="${FUNCNAME[1]}"
-
-    # list of dependent apt packages
-    # using 'list' type with a 'for loop' for future extendibility and reuse
-    deps=("fail2ban")
-    for file in "${deps[@]}"; do
-      apt install $file -y
-    done
-    
-    if [ "${caller}" == "controller_sshkey" ]; then
-      echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
-    fi
-
-    if [ "${caller}" == "build" ]; then
-      export LINODE_PARAMS=("${INSTANCE_PREFIX}" "g6-standard-8" "us-ord" "linode/ubuntu22.04")
-      export LINODE_TAGS="test"
-    fi
-  fi
-}
-
 # controller temp sshkey
 function controller_sshkey {
     ssh-keygen -o -a 100 -t ed25519 -C "ansible" -f "${HOME}/.ssh/id_ansible_ed25519" -q -N "" <<<y >/dev/null
@@ -38,18 +15,24 @@ function controller_sshkey {
     chmod 600 ${SSH_KEY_PATH}
     eval $(ssh-agent)
     ssh-add ${SSH_KEY_PATH}
-    check_mode_deps
+    if [ "${CHECK_MODE}" == "1" ]; then
+      echo $ANSIBLE_SSH_PUB_KEY >> ${HOME}/.ssh/authorized_keys
+    fi
 }
 
 # build instance vars before cluster deployment
 function build {
-  local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label,.type,.region,.image))
-  local LINODE_TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
+  if [ "${CHECK_MODE}" ]; then
+    local LINODE_PARAMS=("${INSTANCE_PREFIX}" "g6-standard-8" "us-ord" "linode/ubuntu22.04")
+    local LINODE_TAGS="test"
+  else
+    local LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label,.type,.region,.image))
+    local LINODE_TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
+  fi
   local KAFKA_VERSION="${KAFKA_VERSION}"
   local group_vars="${WORK_DIR}/group_vars/kafka/vars"
   local TEMP_ROOT_PASS=$(openssl rand -base64 32)
 
-  check_mode_deps
   controller_sshkey
 
   cat << EOF >> ${group_vars}
@@ -118,10 +101,8 @@ function test {
   ansible-playbook -v -i hosts provision.yml --check --extra-vars "@info.yml"
 
   # dry run site.yml
-  # test:inventory
-  # run provision.yml without check mode to populate our vars and hosts files...
+  test:inventory
   ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
-  # then check site.yml
   ansible-playbook -vvv -i hosts site.yml --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
 }
 
