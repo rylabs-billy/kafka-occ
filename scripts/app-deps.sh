@@ -4,15 +4,19 @@
 # configures test environment for ansible check mode
 
 function playbook_deps {
-  echo "[info] Installing playbook dependencies"
-  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  brew install yq
+  echo "[info] installing playbook dependencies"
+  # install yq
+  VERSION=v4.44.6
+  BINARY=yq_linux_amd64
+  curl -sLO "https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz"
+  tar xvf ${BINARY}.tar.gz && mv ${BINARY} /usr/bin/yq
+
   # required files from apt install
   apt install fail2ban -y
 }
 
 function kafka_deps {
-  echo "[info] Configure Kafka dependencies"
+  echo "[info] configure kafka dependencies"
   defaults="roles/kafka/defaults/main.yml"
 
   # add kafka user and group
