@@ -62,13 +62,13 @@ jobs:
           done
           sudo systemctl restart ssh
 
-      - name: Setup tmate debugging session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          detached: true
-        env:
-          TOKEN_PASSWORD: r3@llystr0ngp455w0rd
-          CHECK_MODE: 1
+      # - name: Setup tmate debugging session
+      #   uses: mxschmitt/action-tmate@v3
+      #   with:
+      #     detached: true
+      #   env:
+      #     TOKEN_PASSWORD: r3@llystr0ngp455w0rd
+      #     CHECK_MODE: 1
 
       - name: Run deploy script in check mode
         id: check-mode
@@ -81,14 +81,14 @@ jobs:
           TOKEN_PASSWORD: r3@llystr0ngp455w0rd
           CHECK_MODE: 1
 
-      # - name: Setup tmate debugging session
-      #   uses: mxschmitt/action-tmate@v3
-      #   if: ${{ failure() && github.event.inputs.debug_enabled }}
-      #   # if: ${{ success() || steps.test.conclusion == 'failure' }}
-      #   # if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-      #   # if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-      #   with:
-      #     detached: true
-      #   env:
-      #     TOKEN_PASSWORD: r3@llystr0ngp455w0rd
-      #     CHECK_MODE: 1
+      - name: Setup tmate debugging session
+        uses: mxschmitt/action-tmate@v3
+        # if: ${{ failure() && github.event.inputs.debug_enabled }}
+        # if: ${{ success() || steps.test.conclusion == 'failure' }}
+        # if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        # if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          detached: true
+        env:
+          TOKEN_PASSWORD: r3@llystr0ngp455w0rd
+          CHECK_MODE: 1
