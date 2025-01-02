@@ -22,7 +22,7 @@ jobs:
 
       - name: Set test UDFs
         shell: bash
-        run: sudo ./scripts/test-vars.sh
+        run: ./scripts/test-vars.sh
         # run: ./scripts/test-vars.sh
 
       - name: Hack github actions runner for check mode
@@ -74,7 +74,7 @@ jobs:
       - name: Run deploy script in check mode
         id: check-mode
         shell: bash
-        run: sudo ./scripts/kafka-deploy.sh
+        run: sudo -E ./scripts/kafka-deploy.sh
         # run: |-
         #   sudo -i -u $(whoami)
         #   cd $GITHUB_WORKSPACE
