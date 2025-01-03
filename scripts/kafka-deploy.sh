@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-source ./scripts/app-deps.sh
 DEBUG="NO"
 if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
@@ -95,8 +94,6 @@ function rename_provisioner {
     export INSTANCE_PREFIX="kafka-occ1-${UUID}"
   else
     INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
-    echo this
-    test:check_mode_deps
     export INSTANCE_PREFIX=${INSTANCE_PREFIX}
     curl -s -H "Content-Type: application/json" \
       -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
