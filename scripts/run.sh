@@ -7,53 +7,27 @@ if [ "${DEBUG}" == "NO" ]; then
   trap "cleanup $? $LINENO" EXIT
 fi
 
-function test:file_chk {
-  if [ "${FILE_CHK}" != "1" ]; then
-    # required files from apt install
-    apt install fail2ban -y
 
-    # other required files
-    # write dirs and vars from roles/kafka/defaults/main.yml
-    kafka_file_list=($(
-      cat roles/kafka/defaults/main.yml \
-      | grep -Ev '#|---' \
-      | IFS='\n' awk '{print $2}' \
-      | tr '\n' ' '
-      ))
+# function test:check_mode_deps {
+#   if [ $"${CHECK_MODE}" == "1" ]; then
+#     # get name of caller (parent) function
+#     caller="${FUNCNAME[1]}"
+#     user=$(whoami)
 
-    for file in "${kafka_file_list[@]}"; do
-      [[ "$file" == *"kafka"* ]] && mkdir -p $file || export kafka_version="$file"
-    done
+#     # don't install dependent files a second time
+#     # test:file_chk
 
-    curl -s -o "/tmp/kafka_2.13-${kafka_version}.tgz" \
-      "https://downloads.apache.org/kafka/${kafka_version}/kafka_2.13-${kafka_version}.tgz"
+#     if [ "${caller}" == "controller_sshkey" ]; then
+#       [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
+#       echo $ANSIBLE_SSH_PUB_KEY >> ${HOME_DIR}/.ssh/authorized_keys
+#     fi
 
-    export FILE_CHK="1"
-  fi
-}
-
-
-
-function test:check_mode_deps {
-  if [ $"${CHECK_MODE}" == "1" ]; then
-    # get name of caller (parent) function
-    caller="${FUNCNAME[1]}"
-    user=$(whoami)
-
-    # don't install dependent files a second time
-    # test:file_chk
-
-    if [ "${caller}" == "controller_sshkey" ]; then
-      [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
-      echo $ANSIBLE_SSH_PUB_KEY >> ${HOME_DIR}/.ssh/authorized_keys
-    fi
-
-    if [ "${caller}" == "build" ]; then
-      export LINODE_PARAMS=("${INSTANCE_PREFIX}" "g6-standard-8" "us-ord" "linode/ubuntu22.04")
-      export LINODE_TAGS="test"
-    fi
-  fi
-}
+#     if [ "${caller}" == "build" ]; then
+#       export LINODE_PARAMS=("${INSTANCE_PREFIX}" "g6-standard-8" "us-ord" "linode/ubuntu22.04")
+#       export LINODE_TAGS="test"
+#     fi
+#   fi
+# }
 
 # controller temp sshkey
 function controller_sshkey {
@@ -105,34 +79,6 @@ locality_name: ${LOCALITY_NAME}
 organization_name: ${ORGANIZATION_NAME}
 email_address: ${EMAIL_ADDRESS}
 ca_common_name: ${CA_COMMON_NAME}
-EOF
-}
-
-function test:instance_info {
-  # for provision.yml in check mode
-  cat <<EOF > vars.yml
-truststore_password: 4a3ab688-c959-11ef-b7ef-c3d2d00d00e9
-keystore_password: 4a3ab890-c959-11ef-b7f0-43b5a08a833c
-ca_password: 4a3ab8fe-c959-11ef-b7f1-8b5f5d5abd07
-sudo_password: 4a3ab962-c959-11ef-b7f2-9f75255196f2
-
-info:
-  results:
-    - {"instance": {"ipv4": ["127.1.0.100", "127.2.0.100"]}}
-    - {"instance": {"ipv4": ["127.1.0.101", "127.2.0.101"]}}
-    - {"instance": {"ipv4": ["127.1.0.102", "127.2.0.102"]}}
-EOF
-}
-
-function test:inventory {
-  cat <<EOF > hosts
-# ansible inventory
-# BEGIN KAFKA INSTANCES
-[kafka]
-localhost ansible_connection=local user=$(whoami) role='controller and broker'
-127.1.0.101 role='controller and broker'
-127.1.0.103 role='controller and broker'
-# END KAFKA INSTANCES
 EOF
 }
 
