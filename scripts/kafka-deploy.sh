@@ -73,13 +73,11 @@ function get_privateip {
 }
 
 function configure_privateip {
-  # if [ -n "${CHECK_MODE}" ]; then
-  #   LINODE_IP="192.168.0.2"
-  # else
-  #   LINODE_IP=$(get_privateip)
-  # fi
-  LINODE_IP=$(get_privateip)
-  test:check_mode_deps
+  if [ -n "${CHECK_MODE}" ]; then
+    LINODE_IP="192.168.0.2"
+  else
+    LINODE_IP=$(get_privateip)
+  fi
 
   if [ ! -z "${LINODE_IP}" ]; then
     echo "[info] Linode private IP present"
@@ -93,19 +91,19 @@ function configure_privateip {
 
 function rename_provisioner {
   echo "[info] renaming the provisioner"
-  # if [ -n "${CHECK_MODE}" ]; then
-  #   export INSTANCE_PREFIX="kafka-occ1-${UUID}"
-  # else
-  INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
-  echo this
-  test:check_mode_deps
-  export INSTANCE_PREFIX=${INSTANCE_PREFIX}
-  curl -s -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
-    -X PUT -d "{
-      \"label\": \"${INSTANCE_PREFIX}1-${UUID}\"
-    }" https://api.linode.com/v4/linode/instances/${LINODE_ID}
-  #fi
+  if [ -n "${CHECK_MODE}" ]; then
+    export INSTANCE_PREFIX="kafka-occ1-${UUID}"
+  else
+    INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
+    echo this
+    test:check_mode_deps
+    export INSTANCE_PREFIX=${INSTANCE_PREFIX}
+    curl -s -H "Content-Type: application/json" \
+      -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
+      -X PUT -d "{
+        \"label\": \"${INSTANCE_PREFIX}1-${UUID}\"
+      }" https://api.linode.com/v4/linode/instances/${LINODE_ID}
+  fi
 }
 
 function setup {
@@ -123,18 +121,14 @@ function setup {
       mkdir ~/.ssh
     fi
 
-    # if [ -n "${CHECK_MODE}" ]; then
-    #   echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com" > ${HOME}/.ssh/authorized_keys
-    # else
-    #   curl -sH "Content-Type: application/json" \
-    #     -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
-    #     https://api.linode.com/v4/profile/sshkeys \
-    #     | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
-    # fi
-    curl -sH "Content-Type: application/json" \
-      -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
-      https://api.linode.com/v4/profile/sshkeys \
-      | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
+    if [ -n "${CHECK_MODE}" ]; then
+      echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com" > ${HOME}/.ssh/authorized_keys
+    else
+      curl -sH "Content-Type: application/json" \
+        -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
+        https://api.linode.com/v4/profile/sshkeys \
+        | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
+    fi
   fi
 
   # clone repo and set up ansible environment
