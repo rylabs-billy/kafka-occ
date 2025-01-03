@@ -96,14 +96,15 @@ function rename_provisioner {
   # if [ -n "${CHECK_MODE}" ]; then
   #   export INSTANCE_PREFIX="kafka-occ1-${UUID}"
   # else
-    INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
-    test:check_mode_deps
-    export INSTANCE_PREFIX=${INSTANCE_PREFIX}
-    curl -s -H "Content-Type: application/json" \
-      -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
-      -X PUT -d "{
-        \"label\": \"${INSTANCE_PREFIX}1-${UUID}\"
-      }" https://api.linode.com/v4/linode/instances/${LINODE_ID}
+  INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
+  echo this
+  test:check_mode_deps
+  export INSTANCE_PREFIX=${INSTANCE_PREFIX}
+  curl -s -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
+    -X PUT -d "{
+      \"label\": \"${INSTANCE_PREFIX}1-${UUID}\"
+    }" https://api.linode.com/v4/linode/instances/${LINODE_ID}
   #fi
 }
 
