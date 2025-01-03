@@ -93,7 +93,7 @@ function test:defaults {
   local parsed=($(yq '.[] | ( select(kind == "scalar") | key + "=" + . )' $yaml_file))
 
   declare -A defaults
-  for line in "${parsed[@]}"); do
+  for line in "${parsed[@]}"; do
     key=$(echo $line | awk -F= '{print $1}')
     value=$(echo $line | awk -F= '{print $2}')
     defaults["$key"]="$value"
