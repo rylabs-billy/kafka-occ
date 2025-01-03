@@ -104,7 +104,7 @@ function rename_provisioner {
       -X PUT -d "{
         \"label\": \"${INSTANCE_PREFIX}1-${UUID}\"
       }" https://api.linode.com/v4/linode/instances/${LINODE_ID}
-  fi
+  #fi
 }
 
 function setup {
