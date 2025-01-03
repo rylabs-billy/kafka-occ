@@ -4,7 +4,8 @@ source ./scripts/app-deps.sh
 
 DEBUG="NO"
 if [ "${DEBUG}" == "NO" ]; then
-  trap "cleanup $? $LINENO" EXIT
+  # trap "cleanup $? $LINENO" EXIT
+  trap "cleanup $? $LINENO $BASH_COMMAND" ERR
 fi
 
 
@@ -90,6 +91,7 @@ function deploy {
 ## cleanup ##
 function cleanup {
   if [ "$?" != "0" ]; then
+    echo "Error: $BASH_COMMAND failed with exit code $?"
     if [ -n "$GITHUB_ENV" ]; then
       echo "PLAYBOOK_FAILED=1" | tee -a $GITHUB_ENV
     fi
