@@ -69,7 +69,7 @@ function get_privateip {
   curl -s -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
    https://api.linode.com/v4/linode/instances/${LINODE_ID}/ips | \
-   jq -r '.ipv4.private[].address'
+   jq -r '.ipv4.private[]?.address | if . == null then empty else . end'
 }
 
 function configure_privateip {
