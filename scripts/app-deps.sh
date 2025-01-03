@@ -100,7 +100,7 @@ function test:defaults {
   done
 
   kafka_file_list=()
-  for file in "${!defaults[@]}"
+  for file in "${!defaults[@]}"; do
     if [[ "${defaults[$file]}" == *"kafka"* ]]; then
       kafka_file_list+=("${defaults[$file]}")
     fi
