@@ -3,15 +3,20 @@
 
 - name: configure hostname
   import_tasks: hostname.yml
+  tags: test_files
 
 - name: create kafka user
   import_tasks: user.yml
+  tags: test_files
 
 - name: installing kafka
   import_tasks: install.yml
+  tags: test_files
 
 - name: configure cluster certs
   import_tasks: ssl.yml
+  tags: test_files
 
 - name: configure kafka
   import_tasks: configure.yml
+  tags: test_files

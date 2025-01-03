@@ -30,6 +30,7 @@
     - ufw
     - acl
     state: latest
+  tags: test_files
 
 - name: fail2ban jail.local
   copy:

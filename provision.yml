@@ -40,6 +40,7 @@
         ca_password: "{{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits') }}"
         sudo_password: {{ lookup('password', '/dev/null length=25 chars=ascii_letters,digits') }}
     no_log: true
+    tags: test_vars
 
   - name: creating kafka servers
     linode.cloud.instance:

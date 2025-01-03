@@ -141,26 +141,6 @@ function deploy {
     ansible-playbook -v -i hosts provision.yml && ansible-playbook -v -i hosts site.yml
 }
 
-function test {
-  echo "[info] running ansible playbooks in check mode"
-  build
-  playbook_deps
-  kafka_deps
-
-  # dry run provision.yml
-  test:instance_info
-  # sudo -i -u $(whoami)
-  ansible-playbook -v -i hosts provision.yml --check --extra-vars "@vars.yml"
-
-  # dry run site.yml
-  # test:inventory
-  # run provision.yml without check mode to populate our vars and hosts files...
-  ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@vars.yml"
-  # then check site.yml
-  ansible-playbook -vv -i hosts site.yml --become --check --extra-vars "@vars.yml"
-  # ansible-playbook -vv -i hosts site.yml --become --check --extra-vars "user=$(whoami) ansible_user=$(whoami)"
-}
-
 ## cleanup ##
 function cleanup {
   if [ "$?" != "0" ]; then
