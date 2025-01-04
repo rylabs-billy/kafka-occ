@@ -86,8 +86,10 @@ function destroy {
 function test:check {
   if [ $"${CHECK_MODE}" == "1" ]; then
     # get name of caller (parent) function
-    caller="${FUNCNAME[1]}"
-    user=$(whoami)
+    local name="${FUNCNAME[0]}"
+    local caller="${FUNCNAME[1]}"
+    local user=$(whoami)
+    echo "[info] $name $caller"
 
     if [ "${caller}" == "controller_sshkey" ]; then
       [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
@@ -102,22 +104,25 @@ function test:check {
 }
 
 function test:instance_info {
+  echo "[info] ${FUNCNAME[0]}"
   # for provision.yml in check mode
   echo -e "info:\n  results:" > info.yml
   count=100
 
   for host in $(seq $CLUSTER_SIZE); do
-    echo -e '    - {"instance": {"ipv4": ["127.1.0.'$count'", "127.2.0.'$count'"]}}' >> vars.yml
+    echo -e '    - {"instance": {"ipv4": ["127.1.0.'$count'", "127.2.0.'$count'"]}}' >> info.yml
     ((count++))
   done
 }
 
 function test:provision {
   test:instance_info
+  echo "[info] ${FUNCNAME[0]}"
   ansible-playbook -v -i hosts provision.yml --check --extra-vars "@info.yml"
 }
 
 function test:site {
+  echo "[info] ${FUNCNAME[0]}"
   # run just a couple tagged tasks to write dependent vars and files...  
   ansible-playbook -v -i hosts provision.yml --tags test_vars --extra-vars "@info.yml"
   ansible-plabook -v -i hosts site.yml --become --tags test_files
