@@ -98,6 +98,7 @@ function test:check {
       export LINODE_PARAMS=("${INSTANCE_PREFIX}" "g6-standard-8" "us-ord" "linode/ubuntu22.04")
       export LINODE_TAGS="test"
     fi
+  fi
 }
 
 function test:instance_info {
