@@ -62,13 +62,9 @@ function chk_mode {
     export INSTANCE_PREFIX="kafka-occ1-${UUID}"
 
     [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
-    if [ ! -d "${HOME_DIR}/.ssh" ]; then
-      mkdir -p "${HOME_DIR}/.ssh"
-      echo "${sshkey}" >> "${HOME_DIR}/.ssh/authorized_keys"
-      chmod 600 "${HOME_DIR}/.ssh/authorized_keys"
-      chmod 700 "${HOME_DIR}/.ssh"
-      export _SSH_AUTH=$(cat "${HOME_DIR}/.ssh/authorized_keys")
-    fi
+    [ ! -d "${HOME_DIR}/.ssh" ] && mkdir -p "${HOME_DIR}/.ssh"
+    echo "${sshkey}" >> "${HOME_DIR}/.ssh/authorized_keys"
+    export _SSH_AUTH=$(cat "${HOME_DIR}/.ssh/authorized_keys")
   fi
 }
 
@@ -88,7 +84,7 @@ function get_privateip {
   curl -s -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
    https://api.linode.com/v4/linode/instances/${LINODE_ID}/ips | \
-   jq -r '.ipv4.private[]?.address | if . == null then empty else . end'
+   jq -r '.ipv4.private[].address'
 }
 
 function configure_privateip {
