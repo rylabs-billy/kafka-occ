@@ -62,13 +62,14 @@ function chk_mode {
 
     export LINODE_IP="192.168.0.2"
     export INSTANCE_PREFIX="kafka-occ1-${UUID}"
-    
+
     [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
     if [ ! -d "${HOME_DIR}/.ssh" ]; then
       mkdir -p "${HOME_DIR}/.ssh"
       echo "${sshkey}" >> "${HOME_DIR}/.ssh/authorized_keys"
       chmod 600 "${HOME_DIR}/.ssh/authorized_keys"
       chmod 700 "${HOME_DIR}/.ssh"
+      export _SSH_AUTH=$(cat "${HOME_DIR}/.ssh/authorized_keys")
     fi
   fi
 }
@@ -95,6 +96,7 @@ function get_privateip {
 function configure_privateip {
   if [ -z "${1}" ]; then
     LINODE_IP=$(get_privateip)
+
     if [ -n "${LINODE_IP}" ]; then
       echo "[info] Linode private IP present"
     else
@@ -120,21 +122,19 @@ function rename_provisioner {
 }
 
 function add_ssh_keys {
-  SSH=$(cat ${HOME}/.ssh/authorized_keys)
-
   if [ "${ADD_SSH_KEYS}" == "yes" ]; then
+    echo "[info] getting profile ssh keys"
     if [ ! -d ~/.ssh ] ; then
       mkdir ~/.ssh
     fi
 
-    if [ -z "${SSH}" ]; then
+    if [ -z "${1}" ]; then
       curl -sH "Content-Type: application/json" \
         -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
         https://api.linode.com/v4/profile/sshkeys \
         | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
     fi
   fi
-
 }
 
 function setup {
@@ -147,7 +147,7 @@ function setup {
   # rename provisioner and configure private IP if not present
   rename_provisioner "${INSTANCE_PREFIX}"
   configure_privateip "${LINODE_IP}"
-  add_ssh_keys
+  add_ssh_keys "${_SSH_AUTH}"
 
   # clone repo and set up ansible environment
   # git clone ${GIT_REPO} ${WORK_DIR}
