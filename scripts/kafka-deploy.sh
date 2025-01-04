@@ -57,9 +57,7 @@ function chk_mode {
     local user=$(whoami)
     local sshkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com"
 
-    echo "[info] running check mode"
-    echo "[info] running as $user user"
-
+    echo "[info] running check mode as $user user"
     export LINODE_IP="192.168.0.2"
     export INSTANCE_PREFIX="kafka-occ1-${UUID}"
 
