@@ -54,10 +54,22 @@ fi
 
 function chk_mode {
   if [ "${CHECK_MODE}" == "1" ]; then
+    local user=$(whoami)
+    local sshkey="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com"
+
     echo "[info] running check mode"
+    echo "[info] running as $user user"
+
     export LINODE_IP="192.168.0.2"
     export INSTANCE_PREFIX="kafka-occ1-${UUID}"
-    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com" > ${HOME}/.ssh/authorized_keys
+    
+    [ "${user}" == 'root' ] && HOME_DIR="/root" || HOME_DIR="${HOME}"
+    if [ ! -d "${HOME_DIR}/.ssh" ]; then
+      mkdir -p "${HOME_DIR}/.ssh"
+      echo "${sshkey}" >> "${HOME_DIR}/.ssh/authorized_keys"
+      chmod 600 "${HOME_DIR}/.ssh/authorized_keys"
+      chmod 700 "${HOME_DIR}/.ssh"
+    fi
   fi
 }
 
