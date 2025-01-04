@@ -150,6 +150,7 @@ function setup {
   add_ssh_keys "${_SSH_AUTH}"
 
   # clone repo and set up ansible environment
+  echo "[info] cloning git repo"
   # git clone ${GIT_REPO} ${WORK_DIR}
   # for a single testing branch
   # git clone -b ${BRANCH} ${GIT_REPO} ${WORK_DIR}
@@ -159,6 +160,7 @@ function setup {
   cd ${WORK_DIR}
 
   #pip3 install virtualenv
+  echo "[info] building python env"
   python3 -m venv env
   source env/bin/activate
   pip install pip --upgrade
@@ -166,6 +168,7 @@ function setup {
   ansible-galaxy install -r collections.yml
 
   # copy run script
+  echo "[info] copy run script to \$PATH"
   cp scripts/run.sh /usr/local/bin/run
   chmod +x /usr/local/bin/run
 }
