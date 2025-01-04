@@ -52,6 +52,15 @@ else
   exit 1
 fi
 
+function chk_mode {
+  if [ "${CHECK_MODE}" == "1" ]; then
+    echo "[info] running check mode"
+    export LINODE_IP="192.168.0.2"
+    export INSTANCE_PREFIX="kafka-occ1-${UUID}"
+    echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com" > ${HOME}/.ssh/authorized_keys
+  fi
+}
+
 # cluster functions
 function add_privateip {
   echo "[info] Adding instance private IP"
@@ -72,27 +81,22 @@ function get_privateip {
 }
 
 function configure_privateip {
-  if [ -n "${CHECK_MODE}" ]; then
-    LINODE_IP="192.168.0.2"
-  else
+  if [ -z "${1}" ]; then
     LINODE_IP=$(get_privateip)
-  fi
-
-  if [ ! -z "${LINODE_IP}" ]; then
-    echo "[info] Linode private IP present"
-  else
-    echo "[warn] No private IP found. Adding.."
-    add_privateip
-    LINODE_IP=$(get_privateip)
-    ip addr add ${LINODE_IP}/17 dev eth0 label eth0:1
+    if [ -n "${LINODE_IP}" ]; then
+      echo "[info] Linode private IP present"
+    else
+      echo "[warn] No private IP found. Adding.."
+      add_privateip
+      LINODE_IP=$(get_privateip)
+      ip addr add ${LINODE_IP}/17 dev eth0 label eth0:1
+    fi
   fi
 }
 
 function rename_provisioner {
   echo "[info] renaming the provisioner"
-  if [ -n "${CHECK_MODE}" ]; then
-    export INSTANCE_PREFIX="kafka-occ1-${UUID}"
-  else
+  if [ -z "${1}" ]; then
     INSTANCE_PREFIX=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .label)
     export INSTANCE_PREFIX=${INSTANCE_PREFIX}
     curl -s -H "Content-Type: application/json" \
@@ -103,30 +107,35 @@ function rename_provisioner {
   fi
 }
 
-function setup {
-  # install dependancies
-  export DEBIAN_FRONTEND=noninteractive
-  apt-get update
-  apt-get install -y git python3 python3-pip python3-venv jq
-
-  # rename provisioner and configure private IP if not present
-  rename_provisioner
-  configure_privateip 
+function add_ssh_keys {
+  SSH=$(cat ${HOME}/.ssh/authorized_keys)
 
   if [ "${ADD_SSH_KEYS}" == "yes" ]; then
     if [ ! -d ~/.ssh ] ; then
       mkdir ~/.ssh
     fi
 
-    if [ -n "${CHECK_MODE}" ]; then
-      echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5A bthompson@linode.com" > ${HOME}/.ssh/authorized_keys
-    else
+    if [ -z "${SSH}" ]; then
       curl -sH "Content-Type: application/json" \
         -H "Authorization: Bearer ${TOKEN_PASSWORD}" \
         https://api.linode.com/v4/profile/sshkeys \
         | jq -r .data[].ssh_key > /root/.ssh/authorized_keys
     fi
   fi
+
+}
+
+function setup {
+  # install dependancies
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y git python3 python3-pip python3-venv jq
+  chk_mode
+
+  # rename provisioner and configure private IP if not present
+  rename_provisioner "${INSTANCE_PREFIX}"
+  configure_privateip "${LINODE_IP}"
+  add_ssh_keys
 
   # clone repo and set up ansible environment
   # git clone ${GIT_REPO} ${WORK_DIR}
@@ -151,6 +160,11 @@ function setup {
 
 # main
 setup
-run build
-[ "${CHECK_MODE}" == "1" ] && run test || (run deploy; echo "Installation Complete")
-[ "${DEBUG}" == "NO" ] && cleanup
+if [ "${CHECK_MODE}" == "1" ]; then
+  run test
+else
+  run build
+  run deploy
+  echo "Installation Complete"
+  [ "${DEBUG}" == "NO" ] && cleanup
+fi
